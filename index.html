@@ -208,7 +208,39 @@
     // ese botón es el que vas a usar en el TODO 2 para abrir el modal.
     // ==================================================================
     $('#btn-agregar').on('click', function () {
-      // tu código va aquí
+        const $seleccionados = $('#catalogo-lista input:checked');
+
+  if ($seleccionados.length === 0) {
+    $('#catalogo-aviso').text('Marcá al menos un personaje.');
+    return;
+  }
+
+  $seleccionados.each(function () {
+    const id = $(this).val();
+    const personaje = catalogoPorId[id];
+
+    const $card = $(`
+      <div class="col">
+        <div class="card h-100">
+          <img src="${personaje.image}" class="card-img-top" alt="${personaje.name}">
+          <div class="card-body">
+            <h5 class="card-title">${personaje.name}</h5>
+            <p class="card-text">
+              ${personaje.status} · ${personaje.species}
+            </p>
+            <button type="button" class="btn btn-primary btn-ver-detalle" data-id="${id}">
+              Ver detalle
+            </button>
+          </div>
+        </div>
+      </div>
+    `);
+
+    $('#mi-equipo').append($card);
+  });
+
+  $('#equipo-vacio').hide();
+  $('#catalogo-aviso').text('');
     });
 
     // ==================================================================
