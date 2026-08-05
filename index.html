@@ -122,6 +122,7 @@
               <p class="mb-1"><strong>Origen:</strong> <span id="modalDetalle-origen"></span></p>
               <p class="mb-1"><strong>Última ubicación:</strong> <span id="modalDetalle-ubicacion"></span></p>
               <p class="mb-1"><strong>Tipo de planeta:</strong> <span id="modalDetalle-tipo"></span></p>
+              <p class="mb-1"><strong>Cantidad de episodios:</strong> <span id="modalDetalle-episodios"></span></p>
             </div>
           </div>
         </div>
@@ -278,6 +279,7 @@ $('#mi-equipo').on('click', '.btn-ver-detalle', function () {
   $('#modalDetalle-especie').text(personaje.species);
   $('#modalDetalle-origen').text(personaje.origin.name);
   $('#modalDetalle-ubicacion').text(personaje.location.name);
+  $('#modalDetalle-episodios').text(personaje.episode.length);
 
   // limpiamos el dato del bonus por si el modal ya se abrió antes con otro personaje
   $('#modalDetalle-tipo').text('Cargando…');
