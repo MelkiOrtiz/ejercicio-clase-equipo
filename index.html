@@ -121,7 +121,7 @@
               <p class="mb-1"><strong>Especie:</strong> <span id="modalDetalle-especie"></span></p>
               <p class="mb-1"><strong>Origen:</strong> <span id="modalDetalle-origen"></span></p>
               <p class="mb-1"><strong>Última ubicación:</strong> <span id="modalDetalle-ubicacion"></span></p>
-              <!-- TODO 4 (bonus): agregar aquí el tipo de planeta/dimensión de origen -->
+              <p class="mb-1"><strong>Tipo de planeta:</strong> <span id="modalDetalle-tipo"></span></p>
             </div>
           </div>
         </div>
@@ -207,8 +207,8 @@
     // "btn-ver-detalle" y el atributo data-id="<id del personaje>" —
     // ese botón es el que vas a usar en el TODO 2 para abrir el modal.
     // ==================================================================
-    $('#btn-agregar').on('click', function () {
-        const $seleccionados = $('#catalogo-lista input:checked');
+$('#btn-agregar').on('click', function () {
+  const $seleccionados = $('#catalogo-lista input:checked');
 
   if ($seleccionados.length === 0) {
     $('#catalogo-aviso').text('Marcá al menos un personaje.');
@@ -216,36 +216,45 @@
   }
 
   $seleccionados.each(function () {
-  const id = $(this).val();
+    const id = $(this).val();
 
-  if (equipoActual.has(id)) {
-    $('#catalogo-aviso').text(`${catalogoPorId[id].name} ya está en tu equipo.`);
-    return; // "continue" dentro de un .each()
-  }
+    if (equipoActual.has(id)) {
+      $('#catalogo-aviso').text(`${catalogoPorId[id].name} ya está en tu equipo.`);
+      return;
+    }
 
-  const personaje = catalogoPorId[id];
+    const personaje = catalogoPorId[id];
 
-  const $card = $(`
-    <div class="col">
-      <div class="card h-100">
-        <img src="${personaje.image}" class="card-img-top" alt="${personaje.name}">
-        <div class="card-body">
-          <h5 class="card-title">${personaje.name}</h5>
-          <p class="card-text">${personaje.status} · ${personaje.species}</p>
-          <button type="button" class="btn btn-primary btn-ver-detalle" data-id="${id}">
-            Ver detalle
-          </button>
-          <button type="button" class="btn btn-outline-danger btn-quitar" data-id="${id}">
-            Quitar
-          </button>
+    const $card = $(`
+      <div class="col">
+        <div class="card h-100">
+          <img src="${personaje.image}" class="card-img-top" alt="${personaje.name}">
+          <div class="card-body">
+            <h5 class="card-title">${personaje.name}</h5>
+            <p class="card-text">${personaje.status} · ${personaje.species}</p>
+            <button type="button" class="btn btn-primary btn-ver-detalle" data-id="${id}">
+              Ver detalle
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-quitar" data-id="${id}">
+              Quitar
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `);
+    `);
 
-  $('#mi-equipo').on('click', '.btn-quitar', function () {
+    $('#mi-equipo').append($card);
+    equipoActual.add(id);
+  });
+
+  $('#equipo-vacio').hide();
+  $('#catalogo-aviso').text('');
+});
+
+// Este handler va UNA sola vez, afuera del click de "Agregar al equipo"
+$('#mi-equipo').on('click', '.btn-quitar', function () {
   const id = $(this).data('id');
-  const $card = $(this).closest('.col'); // sube hasta el contenedor de la card
+  const $card = $(this).closest('.col');
 
   $card.remove();
   equipoActual.delete(id);
@@ -253,14 +262,7 @@
   if (equipoActual.size === 0) {
     $('#equipo-vacio').show();
   }
-});$('#mi-equipo').append($card);
-  equipoActual.add(id);
 });
-
-  $('#equipo-vacio').hide();
-  $('#catalogo-aviso').text('');
-    });
-
     // ==================================================================
     // TODO 2 (obligatorio) — Abrir el modal de detalle.
     //
@@ -277,35 +279,30 @@ $('#mi-equipo').on('click', '.btn-ver-detalle', function () {
   $('#modalDetalle-origen').text(personaje.origin.name);
   $('#modalDetalle-ubicacion').text(personaje.location.name);
 
+  // limpiamos el dato del bonus por si el modal ya se abrió antes con otro personaje
+  $('#modalDetalle-tipo').text('Cargando…');
+
   const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
   modal.show();
+
+  if (personaje.origin.url) {
+    $.ajax({
+      url: personaje.origin.url,
+      method: 'GET',
+      dataType: 'json'
+    })
+      .done((planeta) => {
+        $('#modalDetalle-tipo').text(planeta.type || 'Desconocido');
+      })
+      .fail(() => {
+        $('#modalDetalle-tipo').text('No disponible');
+      });
+  } else {
+    $('#modalDetalle-tipo').text('Desconocido');
+  }
 });
-    // ==================================================================
+</script>
 
-    // ==================================================================
-    // TODO 3 (casa) — No permitir duplicados.
-    //
-    // Usando el Set "equipoActual" declarado arriba: antes de agregar un
-    // personaje en el TODO 1, si su id ya está en equipoActual, saltarlo
-    // y avisar en #catalogo-aviso (por ejemplo: "Ese personaje ya está en
-    // tu equipo"). Si lo agregás, sumá su id al Set.
-    //
-    // Agregá también un botón "Quitar" en cada card (delegado igual que
-    // en el TODO 2) que la elimine del DOM y del Set, y vuelva a mostrar
-    // #equipo-vacio si el equipo queda en cero personajes.
-    // ==================================================================
-
-    // ==================================================================
-    // TODO 4 (bonus avanzado) — AJAX encadenado.
-    //
-    // personaje.origin.url (si no está vacío) es la URL completa a otro
-    // endpoint de la misma API con el detalle del planeta de origen. En
-    // el handler del TODO 2, antes de mostrar el modal, hacé un segundo
-    // $.ajax a esa URL y agregá el campo "type" o "dimension" de la
-    // respuesta en el modal. Esto practica encadenar dos llamadas AJAX
-    // (la segunda depende del resultado de la primera).
-    // ==================================================================
-  </script>
 
   <!--
     Puntos para discutir en clase al cerrar el ejercicio:
