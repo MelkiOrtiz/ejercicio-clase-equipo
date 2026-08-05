@@ -246,26 +246,22 @@
     // ==================================================================
     // TODO 2 (obligatorio) — Abrir el modal de detalle.
     //
-    // Las cards de #mi-equipo se crean dinámicamente (no existen todavía
-    // cuando la página carga), así que hay que "delegar" el evento sobre
-    // un contenedor que sí exista desde el principio:
-    //
-    //   $('#mi-equipo').on('click', '.btn-ver-detalle', function () { ... });
-    //
-    // Dentro del handler:
-    //   1. Leer el id con $(this).data('id').
-    //   2. Buscar el personaje en catalogoPorId[id].
-    //   3. Llenar #modalDetalleTitulo, #modalDetalle-imagen (src y alt),
-    //      #modalDetalle-estado, #modalDetalle-especie, #modalDetalle-origen
-    //      (personaje.origin.name) y #modalDetalle-ubicacion (personaje.location.name).
-    //   4. Mostrar el modal.
-    //
-    // ⚠️ Ojo con esto: Bootstrap 5 ya NO depende de jQuery para sus
-    // componentes. $('#modalDetalle').modal('show') (la sintaxis de
-    // Bootstrap 4) no va a funcionar. Hay que usar la API nativa de
-    // Bootstrap 5:
-    //
-    //   new bootstrap.Modal(document.getElementById('modalDetalle')).show();
+$('#mi-equipo').on('click', '.btn-ver-detalle', function () {
+  const id = $(this).data('id');
+  const personaje = catalogoPorId[id];
+
+  $('#modalDetalleTitulo').text(personaje.name);
+  $('#modalDetalle-imagen')
+    .attr('src', personaje.image)
+    .attr('alt', personaje.name);
+  $('#modalDetalle-estado').text(personaje.status);
+  $('#modalDetalle-especie').text(personaje.species);
+  $('#modalDetalle-origen').text(personaje.origin.name);
+  $('#modalDetalle-ubicacion').text(personaje.location.name);
+
+  const modal = new bootstrap.Modal(document.getElementById('modalDetalle'));
+  modal.show();
+});
     // ==================================================================
 
     // ==================================================================
